@@ -27,7 +27,7 @@ class DataParser {
     public $progressCallback;
     /**
      *
-     * @var Iterator
+     * @var \Iterator
      */
     private $iterator;
 
@@ -64,7 +64,7 @@ class DataParser {
                 }
                 // Map source to targets.
                 if (!isset($fieldConfig['source'])) {
-                    var_dump($fieldConfig); die();
+                    throw new \UnexpectedValueException("Field config must contain a `source` key");
                 }
                 $config['sourceMap'][$fieldConfig['source']][] = $target;
             }
