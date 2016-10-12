@@ -5,7 +5,9 @@ namespace SamIT\Streams;
 trait CsvParserTrait
 {
 
-    abstract protected function add(array $map, $record, $lineNr = null, $line = '');
+    abstract protected function add(array $map, array $record, int $lineNr = null, string $raw = '');
+    abstract protected function normalize($value, $type, $row);
+    abstract protected function log(string $text);
 
     protected function read($stream, $length) {
         $result = '';
@@ -45,7 +47,7 @@ trait CsvParserTrait
         return $result;
     }
 
-    protected function importFixedCsvFile($fileName, $stream, $map) {
+    protected function importFixedCsvFile($stream, $map) {
         $lineLength = end($map['csvLayout'])['start'] + end($map['csvLayout'])['length'] + 1;
         $count = 0;
         $start = microtime(true);
@@ -62,17 +64,17 @@ trait CsvParserTrait
 
     protected function importRealCsvFile($fileName, $stream, $map) {
         $count = 0;
-//        $start = microtime(true);
-//        mb_internal_encoding('US-ASCII');
+        $start = microtime(true);
         $fieldNames = fgetcsv($stream, null, isset($map['csvDelimiter']) ?$map['csvDelimiter'] : null);
         $lineNr = 1;
         while ((false !== $line = fgetcsv($stream, null, isset($map['csvDelimiter']) ? $map['csvDelimiter'] : null)) && is_array($line)) {
             if ($line != [null]) {
                 $record = $this->parseRealCsvLine(array_combine($fieldNames, $line), $map);
-                $this->add($fileName, $record, $lineNr, array_combine($fieldNames, $line));
+                $this->add($fileName, $record, $lineNr, $line);
                 $count ++;
                 if ($count % 10000 == 0) {
-                    $this->log('.');
+                    $speed = $count * strlen($line) / 1024 / (microtime(true) - $start);
+                    $this->log("Read: " . number_format($count * strlen($line) / 1024, 0) . "kb at " . number_format($speed, 0) .  "kb/s\n");
                 }
             }
             $lineNr++;
@@ -80,7 +82,7 @@ trait CsvParserTrait
     }
     protected function importCsvFile($fileName, $stream, $map) {
         if (isset($map['csvLayout'])) {
-            $this->importFixedCsvFile($fileName, $stream, $map);
+            $this->importFixedCsvFile($stream, $map);
         } else {
             $this->importRealCsvFile($fileName, $stream, $map);
         }

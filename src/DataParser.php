@@ -76,7 +76,7 @@ class DataParser {
         }
     }
 
-    protected function log($text)
+    protected function log(string $text)
     {
         $callback = $this->logCallback;
         return $callback($text);
@@ -105,7 +105,7 @@ class DataParser {
         return md5(implode('.', array_values($record)));
     }
 
-    protected function add(array $map, $record, $lineNr = null, $raw = null) {
+    protected function add(array $map, array $record, int $lineNr = null, string $raw = '') {
         if (isset($map['hash'])) {
             $record['hash'] = $this->hash($record);
         }

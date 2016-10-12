@@ -6,7 +6,9 @@ namespace SamIT\Streams;
 trait XmlParserTrait
 {
 
-    abstract protected function add(array $map, $record, $lineNr = null, $line = '');
+    abstract protected function add(array $map, array $record, int $lineNr = null, string $raw = '');
+    abstract protected function normalize($value, $type, $row);
+    abstract protected function log(string $text);
 
     /**
      * Parses an XML node
