@@ -24,8 +24,8 @@ class ProgressPrinter
      * @param float $progress The progress mapped to (0..1)
      * @param string $name The name of the indicator.
      */
-    public function progress($progress = 0, $name = 'progress') {
-        if ($progress === 0) {
+    public function progress(float $progress = 0, $name = 'progress') {
+        if (!isset($this->progress[$name])) {
             $this->progress[$name] = microtime(true);
             $remaining = "unknown";
             $spent = "0s";
