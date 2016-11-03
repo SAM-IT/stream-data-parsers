@@ -3,7 +3,6 @@ namespace SamIT\Streams;
 
 
 class DataParser {
-    use ProgressTrait;
     use NormalizeTrait;
     use XmlParserTrait;
     use CsvParserTrait;
@@ -80,6 +79,12 @@ class DataParser {
     {
         $callback = $this->logCallback;
         return $callback($text);
+    }
+
+    protected function progress(float $progress, string $text)
+    {
+        $callback = $this->progressCallback;
+        return $callback($progress, $text);
     }
 
     /**
@@ -171,6 +176,7 @@ class DataParser {
         }
         $this->log(" OK\n");
     }
+
 
     protected function importZipFile($fileName) {
         $zip = new \ZipArchive();
