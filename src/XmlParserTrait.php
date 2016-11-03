@@ -50,7 +50,7 @@ trait XmlParserTrait
             $node = $doc->getElementsByTagName($map['xmlNode'])->item(0);
             do {
                 $record = $this->parseXmlNode($node, $map);
-                $this->add($map, $record, 0, $node);
+                $this->add($map, $record, 0, $node->textContent);
             } while(null !== $node = $node->nextSibling);
         }
 
