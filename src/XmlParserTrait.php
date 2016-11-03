@@ -6,7 +6,7 @@ namespace SamIT\Streams;
 trait XmlParserTrait
 {
 
-    abstract protected function add(array $map, array $record, int $lineNr = null, string $raw = '');
+    abstract protected function add(array $map, array $record, int $lineNr = null, $raw = '');
     abstract protected function normalize($value, $type, $row);
     abstract protected function log(string $text);
 
@@ -50,7 +50,7 @@ trait XmlParserTrait
             $node = $doc->getElementsByTagName($map['xmlNode'])->item(0);
             do {
                 $record = $this->parseXmlNode($node, $map);
-                $this->add($map, $record, 0, $node->textContent);
+                $this->add($map, $record, 0, $node);
             } while(null !== $node = $node->nextSibling);
         }
 

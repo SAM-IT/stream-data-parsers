@@ -5,7 +5,7 @@ namespace SamIT\Streams;
 trait CsvParserTrait
 {
 
-    abstract protected function add(array $map, array $record, int $lineNr = null, string $raw = '');
+    abstract protected function add(array $map, array $record, int $lineNr = null, $raw = '');
     abstract protected function normalize($value, $type, $row);
     abstract protected function log(string $text);
 

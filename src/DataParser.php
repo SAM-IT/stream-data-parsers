@@ -110,7 +110,7 @@ class DataParser {
         return md5(implode('.', array_values($record)));
     }
 
-    protected function add(array $map, array $record, int $lineNr = null, string $raw = '') {
+    protected function add(array $map, array $record, int $lineNr = null, $raw = '') {
         if (isset($map['hash'])) {
             $record['hash'] = $this->hash($record);
         }
