@@ -25,10 +25,25 @@ trait XmlParserTrait
             if (isset($map['sourceMap'][$name])) {
                 foreach($map['sourceMap'][$name] as $target) {
                     //pass null since we do not have implemented $row yes to pass to normalize
-                    if (isset($result[$target]) && $map['map'][$target]['type'] == 'string') {
-                        $result[$target] .= ',' . $this->normalize($attribute->nodeValue, $map['map'][$target]['type'], $node);
+                    $value = $this->normalize($attribute->nodeValue, $map['map'][$target]['type'], $node);
+
+                    if (isset($result[$target])) {
+                        switch ($map['map'][$target]['multiple']) {
+                            case 'array': if (is_array($result[$target])) {
+                                    $result[$target][] = $value;
+                                } else {
+                                    $result[$target] = [$result[$target], $value];
+                                }
+                                break;
+                            case 'last':
+                                $result[$target] = $value;
+                                break;
+                            default:
+                                throw new \Exception("Unknown value for multiple: {$map['map'][$target]['multiple']}");
+
+                        }
                     } else {
-                        $result[$target] = $this->normalize($attribute->nodeValue, $map['map'][$target]['type'], $node);
+                        $result[$target] = $value;
                     }
                 }
             }

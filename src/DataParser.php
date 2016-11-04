@@ -58,13 +58,18 @@ class DataParser {
                 if (isset($fieldConfig[0]) && !isset($fieldConfig['source'])) {
                     $fieldConfig = [
                         'source' => $fieldConfig[0],
-                        'type' => $fieldConfig[1]
+                        'type' => $fieldConfig[1],
                     ];
                 }
                 // Map source to targets.
                 if (!isset($fieldConfig['source'])) {
                     throw new \UnexpectedValueException("Field config must contain a `source` key");
                 }
+                // Defaults.
+                $fieldConfig = array_merge([
+                    'multiple' => 'array'
+                ], $fieldConfig);
+
                 $config['sourceMap'][$fieldConfig['source']][] = $target;
             }
         }
