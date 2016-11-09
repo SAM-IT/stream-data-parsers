@@ -61,13 +61,11 @@ trait XmlParserTrait
         if (isset($map['xmlNode'])) {
             $doc = new \DOMDocument();
             $doc->loadXML(stream_get_contents($stream));
-            $base = basename($fileName);
-            $node = $doc->getElementsByTagName($map['xmlNode'])->item(0);
-            do {
+            while (null !== $node = $doc->getElementsByTagName($map['xmlNode'])->item(0)) {
                 $record = $this->parseXmlNode($node, $map);
                 $this->add($map, $record, 0, $node);
-            } while(null !== $node = $node->nextSibling);
+                $node->parentNode->removeChild($node);
+            }
         }
-
     }
 }
