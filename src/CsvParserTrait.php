@@ -65,21 +65,26 @@ trait CsvParserTrait
     protected function importRealCsvFile($fileName, $stream, $map) {
         $count = 0;
         $start = microtime(true);
-        $fieldNames = fgetcsv($stream, null, isset($map['csvDelimiter']) ?$map['csvDelimiter'] : null);
+        if (isset($map['csvHeaders']) && is_array($map['csvHeaders'])) {
+            $fieldNames = $map['csvHeaders'];
+        } else {
+            $fieldNames = fgetcsv($stream, null, isset($map['csvDelimiter']) ? $map['csvDelimiter'] : null);
+        }
         $lineNr = 1;
         while ((false !== $line = fgetcsv($stream, null, isset($map['csvDelimiter']) ? $map['csvDelimiter'] : null)) && is_array($line)) {
             if ($line != [null]) {
                 $record = $this->parseRealCsvLine(array_combine($fieldNames, $line), $map);
-                $this->add($fileName, $record, $lineNr, $line);
+                $this->add($map, $record, $lineNr, implode(',', $line));
                 $count ++;
                 if ($count % 10000 == 0) {
-                    $speed = $count * strlen($line) / 1024 / (microtime(true) - $start);
-                    $this->log("Read: " . number_format($count * strlen($line) / 1024, 0) . "kb at " . number_format($speed, 0) .  "kb/s\n");
+                    $speed = $count * strlen(implode(',', $line)) / 1024 / (microtime(true) - $start);
+                    $this->log("Read: " . number_format($count * strlen(implode(',', $line)) / 1024, 0) . "kb at " . number_format($speed, 0) .  "kb/s\n");
                 }
             }
             $lineNr++;
         }
     }
+    
     protected function importCsvFile($fileName, $stream, $map) {
         if (isset($map['csvLayout'])) {
             $this->importFixedCsvFile($stream, $map);
