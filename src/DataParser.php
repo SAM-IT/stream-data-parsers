@@ -145,7 +145,7 @@ class DataParser {
         if (!stream_is_local($stream)) {
             stream_set_blocking($stream, 0);
         }
-        $ext = isset($extension) ? $extension : substr($fileName, strrpos($fileName, '.') + 1);
+        $ext = strtolower(isset($extension) ? $extension : substr($fileName, strrpos($fileName, '.') + 1));
         if ($ext === 'zip') {
             // A zip file is a directory, it does not use a map.
             return $this->importZipFile($fileName);
