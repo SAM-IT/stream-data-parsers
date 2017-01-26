@@ -24,11 +24,16 @@ class DataParser {
      * @var callable
      */
     public $progressCallback;
+
     /**
-     *
      * @var \Iterator
      */
     private $iterator;
+
+    /**
+     * @var bool
+     */
+    private $streamBlocking = false;
 
     public function __construct($config = [])
     {
@@ -137,12 +142,9 @@ class DataParser {
             }
         }
     }
-    
-    
-    
 
     protected function importFile($fileName, $stream, $extension = null) {
-        if (!stream_is_local($stream)) {
+        if (!stream_is_local($stream) && $this->streamBlocking) {
             stream_set_blocking($stream, 0);
         }
         $ext = strtolower(isset($extension) ? $extension : substr($fileName, strrpos($fileName, '.') + 1));
