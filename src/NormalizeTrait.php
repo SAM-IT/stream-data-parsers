@@ -19,7 +19,27 @@ trait NormalizeTrait
         } elseif ($type instanceof \Closure) {
             return $type($value, $row);
         } elseif (empty($value)) {
-            return null;
+            switch ($type) {
+                case '!bool':
+                    return is_numeric($value) || is_bool($value) ? true : null;
+                case 'bool':
+                    return is_numeric($value) || is_bool($value) ? false : null;
+                case 'int':
+                    return is_numeric($value) ? intval($value) : null;
+                case 'initials':
+                case 'gender':
+                case 'int_id':
+                case 'string':
+                case 'string-utf8':
+                case 'pc':
+                case 'phone' :
+                case 'date':
+                case 'address-addition':
+                case 'address-letter':
+                    return null;
+                default:
+                    throw new \Exception("Unknown type $type");
+            }
         }
 
         switch ($type) {
