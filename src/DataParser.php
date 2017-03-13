@@ -24,8 +24,8 @@ class DataParser {
      * @var callable
      */
     public $progressCallback;
-
     /**
+     *
      * @var \Iterator
      */
     private $iterator;
@@ -142,6 +142,9 @@ class DataParser {
             }
         }
     }
+    
+    
+    
 
     protected function importFile($fileName, $stream, $extension = null) {
         if (!stream_is_local($stream) && $this->streamBlocking) {
@@ -207,7 +210,7 @@ class DataParser {
             } elseif ($entry instanceof \SplFileInfo) {
                 $this->importFile($entry->getPathname(), fopen($entry->getPathname(), 'rb'));
             } elseif (is_array($entry)) {
-                $this->importFile($entry['fileName'], fopen($entry['fileName'], 'rb'), ArrayHelper::getValue($entry, 'extension'));
+                $this->importFile($entry['fileName'], fopen($entry['fileName'], 'rb'), $entry['extension'] ?? null);
             }
         }
     }

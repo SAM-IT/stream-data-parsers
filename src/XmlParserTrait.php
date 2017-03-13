@@ -57,15 +57,25 @@ trait XmlParserTrait
     }
 
 
-    protected function importXmlFile($fileName, $stream, array $map) {
+    protected function importXmlFile($fileName, $stream, array $map)
+    {
         if (isset($map['xmlNode'])) {
-            $doc = new \DOMDocument();
-            $doc->loadXML(stream_get_contents($stream));
-            while (null !== $node = $doc->getElementsByTagName($map['xmlNode'])->item(0)) {
+            // Check size of stream.
+            $reader = new \XMLReader();
+            if (!$reader->open(StreamProxy::to_uri($stream))) {
+                throw new \Exception("Failed to open stream with XMLReader");
+            }
+
+            // Find first node.
+            do {} while($reader->read() && $reader->name != $map['xmlNode']);
+
+            while($reader->name == $map['xmlNode']) {
+                $node = $reader->expand();
                 $record = $this->parseXmlNode($node, $map);
                 $this->add($map, $record, 0, $node);
-                $node->parentNode->removeChild($node);
+                $reader->next($map['xmlNode']);
             }
+
         }
     }
 }
