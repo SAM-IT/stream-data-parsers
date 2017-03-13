@@ -24,7 +24,7 @@ class StreamProxy
 
     public static function to_uri($stream) {
         self::register();
-        static::$streams[] = $stream;
+        self::$streams[] = $stream;
         return "StreamProxy://" . (count(self::$streams) - 1);
     }
 
