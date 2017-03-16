@@ -64,7 +64,10 @@ trait XmlParserTrait
             $this->findNode($reader, $map['xmlNode']);
 
             do {
-                if (isset($map['dataNode']) && !$this->findNode($reader, $map['dataNode'], $map['dataPath'] ?? null)) {
+                if (
+                    $reader->nodeType == \XMLReader::END_ELEMENT
+                    || (isset($map['dataNode']) && !$this->findNode($reader, $map['dataNode'], $map['dataPath'] ?? null))
+                ) {
                     continue;
                 }
 
@@ -89,12 +92,15 @@ trait XmlParserTrait
                     break;
 
                 case \XMLReader::END_ELEMENT:
+                    if (empty($currentPath)) {
+                        return false;
+                    }
                     array_pop($currentPath);
                     break;
             }
 
         } while ($reader->nodeType != \XMLReader::NONE);
-
+        
         return false;
     }
 }
