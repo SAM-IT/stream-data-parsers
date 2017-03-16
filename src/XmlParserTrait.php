@@ -2,10 +2,8 @@
 
 namespace SamIT\Streams;
 
-
 trait XmlParserTrait
 {
-
     abstract protected function add(array $map, array $record, int $lineNr = null, $raw = '');
     abstract protected function normalize($value, $type, $row);
     abstract protected function log(string $text);
@@ -13,8 +11,10 @@ trait XmlParserTrait
     /**
      * Parses an XML node
      * @param \DOMElement $node
-     * @param string $mapName
+     * @param $map
      * @return array Returns an associative array.
+     * @throws \Exception
+     * @internal param string $mapName
      */
     protected function parseXmlNode(\DOMElement $node, $map) {
         /** @var \DOMElement $attribute */
@@ -56,26 +56,45 @@ trait XmlParserTrait
         return $result;
     }
 
-
-    protected function importXmlFile($fileName, $stream, array $map)
-    {
+    protected function importXmlFile($fileName, $stream, array $map) {
         if (isset($map['xmlNode'])) {
-            // Check size of stream.
             $reader = new \XMLReader();
-            if (!$reader->open(StreamProxy::to_uri($stream))) {
-                throw new \Exception("Failed to open stream with XMLReader");
-            }
+            $reader->open(StreamProxy::to_uri($stream));
 
-            // Find first node.
-            do {} while($reader->read() && $reader->name != $map['xmlNode']);
+            $this->findNode($reader, $map['xmlNode']);
 
-            while($reader->name == $map['xmlNode']) {
+            do {
+                if (isset($map['dataNode']) && !$this->findNode($reader, $map['dataNode'], $map['dataPath'] ?? null)) {
+                    continue;
+                }
+
                 $node = $reader->expand();
-                $record = $this->parseXmlNode($node, $map);
-                $this->add($map, $record, 0, $node);
-                $reader->next($map['xmlNode']);
+                $this->add($map, $this->parseXmlNode($node, $map), 0, $node);
+            } while ($reader->next($map['xmlNode']));
+        }
+    }
+
+    private function findNode(\XMLReader $reader, string $localName, array $path = null)
+    {
+        $currentPath = [];
+        do {
+            $reader->read();
+
+            switch ($reader->nodeType) {
+                case \XMLReader::ELEMENT:
+                    if ($reader->localName === $localName && ($path === null || $currentPath === $path)) {
+                        return true;
+                    }
+                    array_push($currentPath, $reader->localName);
+                    break;
+
+                case \XMLReader::END_ELEMENT:
+                    array_pop($currentPath);
+                    break;
             }
 
-        }
+        } while ($reader->nodeType != \XMLReader::NONE);
+
+        return false;
     }
 }
