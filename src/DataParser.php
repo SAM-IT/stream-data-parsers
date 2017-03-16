@@ -198,8 +198,9 @@ class DataParser {
             $fileName = $zip->getNameIndex($i);
             $stream = $zip->getStream($fileName);
             $this->importFile($fileName, $stream);
-
+            fclose($stream);
         }
+        $zip->close();
         $this->progress(1, $base);
     }
 
